@@ -45,14 +45,14 @@ export class EbooksController {
         let coverUrl = createEbookDto.coverUrl;
 
         if (files?.file?.[0]) {
-            const serverUrl = 'https://api.sniperbusinessebook.online/'; // Should be env var
+            const serverUrl = 'https://api.sniperbusinessebook.online'; // Should be env var
             pdfUrl = `${serverUrl}/uploads/${files.file[0].filename}`;
         }
 
         // If a file is uploaded for cover, use it (overwriting any base64 sent). 
         // If not, keep the base64 sent in createEbookDto.coverUrl
         if (files?.cover?.[0]) {
-            const serverUrl = 'https://api.sniperbusinessebook.online/'; // Should be env var
+            const serverUrl = 'https://api.sniperbusinessebook.online'; // Should be env var
             coverUrl = `${serverUrl}/uploads/${files.cover[0].filename}`;
         }
 
