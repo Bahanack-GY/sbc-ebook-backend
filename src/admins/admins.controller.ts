@@ -39,4 +39,9 @@ export class AdminsController {
         // req.user is set by JwtStrategy
         return this.adminsService.updateProfile(req.user.userId, updateProfileDto);
     }
+
+    @Get('public/:idOrCode')
+    findPublic(@Param('idOrCode') idOrCode: string) {
+        return this.adminsService.findPublic(idOrCode);
+    }
 }

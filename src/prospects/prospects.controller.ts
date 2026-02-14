@@ -27,8 +27,9 @@ export class ProspectsController {
 
     @UseGuards(AuthGuard('jwt'))
     @Get('stats')
-    getStats() {
-        return this.prospectsService.getStats();
+    getStats(@Request() req) {
+        const adminId = req.user.role === 'SUPER_ADMIN' ? undefined : req.user.userId;
+        return this.prospectsService.getStats(adminId);
     }
 
     @UseGuards(AuthGuard('jwt'))
@@ -52,7 +53,8 @@ export class ProspectsController {
 
     @UseGuards(AuthGuard('jwt'))
     @Get('verification-stats')
-    getVerificationStats() {
-        return this.prospectsService.getVerificationStats();
+    getVerificationStats(@Request() req) {
+        const adminId = req.user.role === 'SUPER_ADMIN' ? undefined : req.user.userId;
+        return this.prospectsService.getVerificationStats(adminId);
     }
 }

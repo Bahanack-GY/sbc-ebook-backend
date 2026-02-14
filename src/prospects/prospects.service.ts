@@ -126,11 +126,14 @@ export class ProspectsService {
         return this.prospectModel.findByIdAndUpdate(id, { sbcStatus: status }, { new: true }).exec();
     }
 
-    async getStats() {
-        const total = await this.prospectModel.countDocuments();
-        const inscribed = await this.prospectModel.countDocuments({ sbcStatus: SbcStatus.INSCRIT });
-        const subscribers = await this.prospectModel.countDocuments({ sbcStatus: SbcStatus.ABONNE });
-        const verifiedMembers = await this.prospectModel.countDocuments({ membershipFound: true });
+    async getStats(adminId?: string) {
+        const filter: any = {};
+        if (adminId) filter.adminId = adminId;
+
+        const total = await this.prospectModel.countDocuments(filter);
+        const inscribed = await this.prospectModel.countDocuments({ ...filter, sbcStatus: SbcStatus.INSCRIT });
+        const subscribers = await this.prospectModel.countDocuments({ ...filter, sbcStatus: SbcStatus.ABONNE });
+        const verifiedMembers = await this.prospectModel.countDocuments({ ...filter, membershipFound: true });
 
         const conversionRate = total > 0 ? ((inscribed + subscribers) / total) * 100 : 0;
         const verifiedConversionRate = total > 0 ? (verifiedMembers / total) * 100 : 0;
@@ -266,10 +269,14 @@ export class ProspectsService {
     /**
      * Get verification-specific statistics
      */
-    async getVerificationStats() {
-        const total = await this.prospectModel.countDocuments();
-        const verifiedMembers = await this.prospectModel.countDocuments({ membershipFound: true });
+    async getVerificationStats(adminId?: string) {
+        const filter: any = {};
+        if (adminId) filter.adminId = adminId;
+
+        const total = await this.prospectModel.countDocuments(filter);
+        const verifiedMembers = await this.prospectModel.countDocuments({ ...filter, membershipFound: true });
         const pendingVerification = await this.prospectModel.countDocuments({
+            ...filter,
             membershipFound: { $ne: true },
             $or: [
                 { lastVerifiedAt: { $exists: false } },
@@ -278,7 +285,7 @@ export class ProspectsService {
             ]
         });
         const lastVerification = await this.prospectModel
-            .findOne({ lastVerifiedAt: { $exists: true } })
+            .findOne({ ...filter, lastVerifiedAt: { $exists: true } })
             .sort({ lastVerifiedAt: -1 })
             .select('lastVerifiedAt')
             .exec();
