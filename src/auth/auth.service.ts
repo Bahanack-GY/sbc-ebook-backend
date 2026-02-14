@@ -10,7 +10,7 @@ export class AuthService {
         private jwtService: JwtService
     ) { }
 
-    async signIn(username: string, pass: string): Promise<{ access_token: string, adminId: string, role: string }> {
+    async signIn(username: string, pass: string): Promise<{ access_token: string, adminId: string, role: string, referralCode?: string }> {
         const admin = await this.adminsService.findOne(username);
         if (!admin) {
             throw new UnauthorizedException('Invalid credentials');
@@ -29,7 +29,8 @@ export class AuthService {
         return {
             access_token: await this.jwtService.signAsync(payload),
             adminId: admin._id.toString(),
-            role: admin.role
+            role: admin.role,
+            referralCode: admin.referralCode
         };
     }
 }

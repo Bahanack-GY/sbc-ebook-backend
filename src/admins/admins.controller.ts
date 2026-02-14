@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, UseGuards, Delete, Patch, Param } from '@nestjs/common';
+import { Body, Controller, Post, Get, UseGuards, Delete, Patch, Param, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AdminsService } from './admins.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
@@ -31,5 +31,12 @@ export class AdminsController {
     @Patch(':id/suspend')
     toggleSuspension(@Param('id') id: string) {
         return this.adminsService.toggleSuspension(id);
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Patch('profile')
+    updateProfile(@Req() req, @Body() updateProfileDto: any) {
+        // req.user is set by JwtStrategy
+        return this.adminsService.updateProfile(req.user.userId, updateProfileDto);
     }
 }

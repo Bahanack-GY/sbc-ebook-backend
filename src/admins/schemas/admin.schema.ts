@@ -21,6 +21,12 @@ export class Admin {
 
     @Prop({ default: false })
     isSuspended: boolean;
+
+    @Prop({ required: false })
+    referralCode?: string;
+
+    @Prop({ required: false })
+    phoneNumber?: string;
 }
 
 export const AdminSchema = SchemaFactory.createForClass(Admin);

@@ -37,4 +37,8 @@ export class AdminsService {
         if (!admin) return null;
         return this.adminModel.findByIdAndUpdate(id, { isSuspended: !admin.isSuspended }, { new: true }).exec();
     }
+
+    async updateProfile(id: string, updateData: { referralCode?: string, phoneNumber?: string }): Promise<Admin | null> {
+        return this.adminModel.findByIdAndUpdate(id, updateData, { new: true }).select('-password').exec();
+    }
 }
