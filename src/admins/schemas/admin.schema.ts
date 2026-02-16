@@ -27,6 +27,12 @@ export class Admin {
 
     @Prop({ required: false })
     phoneNumber?: string;
+
+    @Prop({ required: false })
+    salesPageLink?: string;
+
+    @Prop({ required: false })
+    whatsappGroupLink?: string;
 }
 
 export const AdminSchema = SchemaFactory.createForClass(Admin);

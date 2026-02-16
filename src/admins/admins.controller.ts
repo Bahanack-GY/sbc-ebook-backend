@@ -40,6 +40,12 @@ export class AdminsController {
         return this.adminsService.updateProfile(req.user.userId, updateProfileDto);
     }
 
+    @UseGuards(AuthGuard('jwt'))
+    @Get('profile')
+    getProfile(@Req() req) {
+        return this.adminsService.getProfile(req.user.userId);
+    }
+
     @Get('public/:idOrCode')
     findPublic(@Param('idOrCode') idOrCode: string) {
         return this.adminsService.findPublic(idOrCode);

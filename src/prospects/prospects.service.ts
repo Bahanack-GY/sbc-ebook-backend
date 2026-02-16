@@ -52,48 +52,48 @@ export class ProspectsService {
 
     private async sendEbookEmail(prospect: Prospect, ebookId: string) {
         if (!this.transporter && !this.configService.get<string>('SMTP_HOST')) {
-            this.logger.log(`[MOCK EMAIL] To: ${prospect.email}, EbookId: ${ebookId} - Content: Here is your ebook!`);
+            this.logger.log(`[MOCK EMAIL] To: ${prospect.email}, EbookId: ${ebookId} - Content: Here are your ebooks!`);
             return;
         }
 
-        let ebookTitle = 'SBC Ebook';
+        const ebooks = await this.ebooksService.findVisible();
         const attachments: { filename: string; path: string; }[] = [];
+        const ebookTitles: string[] = [];
 
-        if (ebookId) {
-            const ebook = await this.ebooksService.findOne(ebookId);
-            if (ebook) {
-                ebookTitle = ebook.title;
-                if (ebook.pdfUrl) {
-                    let attachmentPath = ebook.pdfUrl;
-                    // If the URL points to our own server's uploads, resolve to local path
-                    if (ebook.pdfUrl.includes('/uploads/')) {
-                        // Extract filename from URL
-                        const filename = ebook.pdfUrl.split('/uploads/').pop();
-                        if (filename) {
-                            // Assuming uploads are in project root/uploads. 
-                            // adjust path relative to dist/src/prospects/prospects.service.js which is deep.
-                            // Better: use process.cwd() or similar.
-                            // Note: In local dev, process.cwd() is usually project root.
-                            attachmentPath = require('path').join(process.cwd(), 'uploads', filename);
-                        }
+        for (const ebook of ebooks) {
+            ebookTitles.push(ebook.title);
+            if (ebook.pdfUrl) {
+                let attachmentPath = ebook.pdfUrl;
+                // If the URL points to our own server's uploads, resolve to local path
+                if (ebook.pdfUrl.includes('/uploads/')) {
+                    // Extract filename from URL
+                    const filename = ebook.pdfUrl.split('/uploads/').pop();
+                    if (filename) {
+                        // Assuming uploads are in project root/uploads. 
+                        attachmentPath = require('path').join(process.cwd(), 'uploads', filename);
                     }
-
-                    attachments.push({
-                        filename: `${ebook.title}.pdf`,
-                        path: attachmentPath
-                    });
                 }
+
+                attachments.push({
+                    filename: `${ebook.title}.pdf`,
+                    path: attachmentPath
+                });
             }
         }
+
+        const subject = `Vos Ebooks SBC offerts !`;
 
         const mailOptions = {
             from: this.configService.get<string>('SMTP_FROM', '"SBC Ebooks" <noreply@example.com>'),
             to: prospect.email,
-            subject: `Votre Ebook: ${ebookTitle}`,
-            text: `Bonjour ${prospect.firstName},\n\nMerci d'avoir téléchargé "${ebookTitle}".\n\nVous trouverez votre ebook en pièce jointe.\n\nCordialement,\nL'équipe SBC`,
+            subject: subject,
+            text: `Bonjour ${prospect.firstName},\n\nMerci de votre intérêt. Voici les ebooks promis pour vous aider à démarrer.\n\nVous trouverez vos ebooks en pièce jointe.\n\nCordialement,\nL'équipe SBC`,
             html: `<p>Bonjour <strong>${prospect.firstName}</strong>,</p>
-                   <p>Merci d'avoir téléchargé "<strong>${ebookTitle}</strong>".</p>
-                   <p>Vous trouverez votre ebook en pièce jointe.</p>
+                   <p>Merci de votre intérêt. Voici les ebooks promis pour vous aider à démarrer :</p>
+                   <ul>
+                    ${ebookTitles.map(title => `<li>${title}</li>`).join('')}
+                   </ul>
+                   <p>Vous trouverez vos ebooks en pièce jointe.</p>
                    <p>Cordialement,<br>L'équipe SBC</p>`,
             attachments: attachments
         };

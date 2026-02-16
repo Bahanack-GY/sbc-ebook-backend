@@ -38,18 +38,22 @@ export class AdminsService {
         return this.adminModel.findByIdAndUpdate(id, { isSuspended: !admin.isSuspended }, { new: true }).exec();
     }
 
-    async updateProfile(id: string, updateData: { referralCode?: string, phoneNumber?: string }): Promise<Admin | null> {
+    async updateProfile(id: string, updateData: { referralCode?: string, phoneNumber?: string, salesPageLink?: string, whatsappGroupLink?: string }): Promise<Admin | null> {
         return this.adminModel.findByIdAndUpdate(id, updateData, { new: true }).select('-password').exec();
+    }
+
+    async getProfile(id: string): Promise<Admin | null> {
+        return this.adminModel.findById(id).select('-password').exec();
     }
 
     async findPublic(idOrCode: string): Promise<{ phoneNumber?: string, referralCode?: string, _id: string } | null> {
         // Try finding by ID first if it looks like an ObjectId (24 hex chars)
         if (idOrCode.match(/^[0-9a-fA-F]{24}$/)) {
-            const admin = await this.adminModel.findById(idOrCode).select('phoneNumber referralCode').exec();
+            const admin = await this.adminModel.findById(idOrCode).select('phoneNumber referralCode salesPageLink whatsappGroupLink').exec();
             if (admin) return admin;
         }
 
         // Fallback or explicit check by referralCode
-        return this.adminModel.findOne({ referralCode: idOrCode }).select('phoneNumber referralCode').exec();
+        return this.adminModel.findOne({ referralCode: idOrCode }).select('phoneNumber referralCode salesPageLink whatsappGroupLink').exec();
     }
 }
