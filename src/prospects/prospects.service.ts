@@ -100,7 +100,7 @@ export class ProspectsService {
 
         try {
             await this.transporter.sendMail(mailOptions);
-            this.logger.log(`Email sent to ${prospect.email} with ebook ${ebookTitle}`);
+            this.logger.log(`Email sent to ${prospect.email} with ebooks: ${ebookTitles.join(', ')}`);
         } catch (error) {
             this.logger.error(`Failed to send email to ${prospect.email}`, error);
         }

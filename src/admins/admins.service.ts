@@ -46,7 +46,7 @@ export class AdminsService {
         return this.adminModel.findById(id).select('-password').exec();
     }
 
-    async findPublic(idOrCode: string): Promise<{ phoneNumber?: string, referralCode?: string, _id: string } | null> {
+    async findPublic(idOrCode: string): Promise<{ phoneNumber?: string, referralCode?: string, salesPageLink?: string, whatsappGroupLink?: string, _id: any } | null> {
         // Try finding by ID first if it looks like an ObjectId (24 hex chars)
         if (idOrCode.match(/^[0-9a-fA-F]{24}$/)) {
             const admin = await this.adminModel.findById(idOrCode).select('phoneNumber referralCode salesPageLink whatsappGroupLink').exec();
